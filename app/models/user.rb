@@ -8,4 +8,17 @@ class User < ActiveRecord::Base
   has_many :taken_surveys, through: :takers, source: :survey
 
   has_many :responses
+
+  def authenticate(plaintext_password)
+    if BCrypt::Password.new(self.password_hash) == plaintext_password
+      return true
+    else
+      return false
+    end
+  end
+
+  def password=(plaintext)
+    self.password_hash = BCrypt::Password.create(plaintext)
+  end
+  
 end
