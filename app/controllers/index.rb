@@ -1,7 +1,34 @@
 get '/' do 
-  erb :index
+  if session[:user_id] == nil 
+    erb :index
+  else 
+    erb :homepage
+  end 
 end 
 
-post '/' do
+post '/login' do
+  @user = User.find_by(username: params[:user][:username])
+  if @user.nil? || !@user.authenticate(params[:user][:password])
+    @login_invalid = true 
+    erb :index 
+  else 
+    session[:user_id] = @user.id 
+    erb :homepage
+  end 
+end 
 
+post '/register' do 
+  @user = User.new(username: params[:user][:username], password: params[:user][:password])
+  if !@user.save
+    @register_invalid = true
+    erb :index
+  else
+    session[:user_id] = @user.id
+    erb :homepage
+  end 
+end 
+
+post '/logout' do 
+  session[:user_id] = nil 
+  erb :index
 end 
