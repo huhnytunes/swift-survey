@@ -1,13 +1,28 @@
-<h1> Survey </h1> 
+<a href="/">Home</a>
+<div class="survey_stats">
+	<% if current_user.taken_surveys.where(id: @survey.id).empty? %>
+		<a id="<%=@survey.id%>" class="take_survey" href='/surveys/<%=@survey.id%>/take'>Take Survey!</a>
+	<% else %>
+		<p>You've taken this survey</p>
+	<% end %>
 
-<h2><%=@questions.first.content%></h2> 
 
-<% @questions.first.choices.each do |choice|%> 
-<p class='choice'> <%=choice.content%> </p> 
-<%end%> 
+	<div id="player"></div>
 
+	<h2> Survey Stats: </h1>
+	<% @survey.questions.each do |question| %>
+		<div id="choice_percents">
+			<%= question.content %>( <%= question.responses.length %> response(s))
+			<% question.choice_percents.each do |cp| %>
+			<ul>
+				<li><%= cp[:content] %> - <%= cp[:percent]*100 %>%</li>
+			</ul>
+			<% end %>
+		</div>
+	<% end %>
+</div>
 
-<!-- <form action='' method='get'>
-  <input type='text' name='answer' value='<%
+<div class='take_survey_question_display'>
+</div>
 
-</form> -->
+<div id="movie"></div>
