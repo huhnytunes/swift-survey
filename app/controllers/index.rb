@@ -1,28 +1,28 @@
-get '/' do 
-  @surveys = Survey.all 
-  if session[:user_id] == nil 
+get '/' do
+  @surveys = Survey.all
+  if session[:user_id] == nil
     puts "hey"
     erb :index
-  else 
+  else
     @user = User.find(current_user.id)
     erb :homepage
-  end 
-end 
+  end
+end
 
 post '/login' do
   @user = User.find_by(username: params[:user][:username])
   if @user.nil? || !@user.authenticate(params[:user][:password])
-    @login_invalid = true 
+    @login_invalid = true
     puts 'if'
-    erb :index 
-  else 
+    erb :index
+  else
     puts 'else'
-    session[:user_id] = @user.id 
+    session[:user_id] = @user.id
     redirect '/'
-  end 
-end 
+  end
+end
 
-post '/register' do 
+post '/register' do
   @user = User.new(username: params[:user][:username], password: params[:user][:password])
   if !@user.save
     @register_invalid = true
@@ -30,10 +30,10 @@ post '/register' do
   else
     session[:user_id] = @user.id
     redirect '/'
-  end 
-end 
+  end
+end
 
-post '/logout' do 
-  current_user = nil 
+get '/logout' do
+  current_user = nil
   erb :index
-end 
+end
