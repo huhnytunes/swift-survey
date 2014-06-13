@@ -1,11 +1,15 @@
 ## USER(SURVEY CREATOR) PAGES ################################
-get '/users/surveys'
+get '/users/surveys' do 
   @surveys = Survey.where(creator_id: current_user)
   erb :created_surveys
 end
 
-
-get '/users/surveys/:survey_id'
-  @survey = Survey.where(survey_id: params[:survey_id])
-  erb :survey_stats
+get '/users/surveys/:survey_id' do 
+  redirect '/surveys/:id'
 end
+
+get '/users/:id/surveys' do 
+  @user = User.find(params[:id])
+  @surveys = Survey.where(creator_id: @user.id)
+  erb :created_surveys_other_user 
+end 
