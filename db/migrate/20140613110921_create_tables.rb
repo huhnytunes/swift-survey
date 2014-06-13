@@ -8,7 +8,7 @@ class CreateTables < ActiveRecord::Migration
     end 
   end
 
-  def change
+  
     create_table :takers do |t| 
       t.references :user
       t.references :survey
@@ -17,7 +17,7 @@ class CreateTables < ActiveRecord::Migration
     end
   end 
 
-  def change
+  
     create_table :surveys do |t| 
       t.string :title
       t.references :creator
@@ -26,7 +26,7 @@ class CreateTables < ActiveRecord::Migration
     end
   end 
 
-  def change
+  
     create_table :questions do |t| 
       t.text :content
       t.references :survey 
@@ -35,7 +35,7 @@ class CreateTables < ActiveRecord::Migration
     end
   end 
 
-  def change
+  
     create_table :choices do |t| 
       t.text :content
       t.references :question
@@ -44,7 +44,7 @@ class CreateTables < ActiveRecord::Migration
     end
   end 
 
-  def change
+  
     create_table :responses do |t| 
       t.references :choice
       t.references :user
