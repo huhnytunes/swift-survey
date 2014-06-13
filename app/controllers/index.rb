@@ -1,4 +1,5 @@
 get '/' do 
+  @surveys = Survey.all 
   if session[:user_id] == nil 
     erb :index
   else 
@@ -13,7 +14,7 @@ post '/login' do
     erb :index 
   else 
     session[:user_id] = @user.id 
-    erb :homepage
+    redirect '/'
   end 
 end 
 
@@ -24,7 +25,7 @@ post '/register' do
     erb :index
   else
     session[:user_id] = @user.id
-    erb :homepage
+    redirect '/'
   end 
 end 
 

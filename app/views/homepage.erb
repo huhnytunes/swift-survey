@@ -1,5 +1,13 @@
-<h1> HI </h1> 
+<h1><%=@user.username%>'s HomePage'</h1> 
+<ul> 
+<% @surveys.each do |survey| %> 
+  <li>survey.title</li>
+  <li>survey.content</li> 
+  <%end%> 
+</ul>
+
 
 <form action='/logout' method='post'>
   <input type='submit' value='logout'>
 </form>
+
