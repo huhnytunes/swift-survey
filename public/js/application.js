@@ -5,6 +5,7 @@ var getNextQuestion = function(e) {
 }
 
 $(document).ready(function() {
+
   console.log("document is ready");
 
   $('.choice').on('click', getNextQuestion);
