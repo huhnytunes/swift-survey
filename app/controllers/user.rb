@@ -1,7 +1,11 @@
-get '/users/:id'
+## USER(SURVEY CREATOR) PAGES ################################
+get '/users/surveys'
+  @surveys = Survey.where(creator_id: current_user)
+  erb :created_surveys
+end
 
-end 
 
-get '/users/:id/surveys/:id'
-
-end 
+get '/users/surveys/:survey_id'
+  @survey = Survey.where(survey_id: params[:survey_id])
+  erb :survey_stats
+end
