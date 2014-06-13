@@ -4,7 +4,12 @@
 
 <% if @surveys %>
 <% @surveys.each do |survey| %>
-<a href="/users/surveys/<%= survey.id %>"><%=survey.title %></a><br>
+<a href="/users/surveys/<%= survey.id %>"><%=survey.title %></a>
+<form style="display:inline" action='/surveys/<%= survey.id %>' method="post">
+	<input type="hidden" name="_method" value="delete">
+	<input type="submit" value="Delete survey">		
+</form>
+<br/>
 <% end %>
 <% else %>
 

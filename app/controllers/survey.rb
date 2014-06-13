@@ -35,3 +35,9 @@ post '/surveys/:id/finish' do
   current_user.saveResponses(params[:id],questions)
   status 200
 end
+
+delete '/surveys/:id' do
+  survey = Survey.find(params[:id])
+  survey.destroy
+  redirect '/users/surveys'
+end

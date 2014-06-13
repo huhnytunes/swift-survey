@@ -17,11 +17,7 @@ function Controller(el, survey, view) {
 	this.survey = survey;
 	this.view = view;
 
-	var self = this;
-
 	// CREATE SURVEY EVENTS
-	// // listen for button to create new survey
-	// $('.create_survey').on('click', this.createSurvey.bind(this));
 	// listen for button to add new question
 	$('.new_question').on('click', this.addNewQuestion.bind(this));
 	// listen for button to submit survey
@@ -30,9 +26,6 @@ function Controller(el, survey, view) {
 	$('#question').on('click', '.add_choice', this.addChoice.bind(this));
 	// listen for button to remove choice from current question
 	$('#question').on('click', '.remove_class', this.removeChoice.bind(this));
-	// $('.add_choice').on('click', this.addChoice.bind(this));
-	// listen for button to remove choice from current question
-	// $('.remove_choice').on('click', this.removeChoice.bind(this));
 
 	// TAKE SURVEY EVENTS
 	// listen for button to take new survey
@@ -47,23 +40,16 @@ function Controller(el, survey, view) {
 }
 
 Controller.prototype.createSurvey = function(e) {
-	// We're creating a new survey. Let's reset all of the survey object's properties
-	this.survey.createSurvey(title); //get title from the form; set controller's survey object
-
+	this.survey.createSurvey(title); 
 	this.view.displayAddNewQuestion();
 };
 
 Controller.prototype.addNewQuestion = function(e) {
-	console.log(e.target)
-	// based on the user input, add a new question object to this.survey questions array
-	this.view.displayAddNewQuestion(e.target); // ask view to display a new blank form
-
+	this.view.displayAddNewQuestion(e.target);
 };
 
 Controller.prototype.submitSurvey = function(e) {
-	this.survey.submitSurvey(); // have survey object send ajax request to save the survey (and its questions/choices) to the database
-	// dont use e.preventDefault(). in the erb, have the route redirect to user's homepage.
-	// this way, we both have an ajax request and a route to the users homepage
+	this.survey.submitSurvey();
 };
 
 Controller.prototype.getSurvey = function(e) {
@@ -85,20 +71,10 @@ Controller.prototype.selectChoice = function(e) {
 }
 
 Controller.prototype.getNextQuestion = function(e) {
-	// update appropriate question.userChoice based on what the user selected
-	this.view.displayGetNextQuestion(); // ask the view to display the next question:
+	e.preventDefault();
+	this.survey.saveUserChoice();
+	this.view.displayGetNextQuestion();
 };
-
-// Controller.prototype.finishSurvey = function(e) {
-// 	// when this happens, user has answered every question in the survey (i.e. userChoice property exists for every question in the survey)
-// 	// we need to save this info in the db via AJAX => ask survey to do this
-// 	this.survey.finishSurvey();
-// 	// dont use e.preventDefault(). in erb, the route should redirect to some page (thanks for taking survey, etc?)
-// 	// this way, we both have an ajax request and a route to the users homepage
-// 	e.preventDefault();
-// 	this.survey.saveUserChoice();
-// 	this.view.displayGetNextQuestion();
-// };
 
 Controller.prototype.finishSurvey = function(e) {
 	e.preventDefault();
@@ -108,13 +84,10 @@ Controller.prototype.finishSurvey = function(e) {
 };
 
 Controller.prototype.addChoice = function(e) {
-	// console.log(e.target)
 	this.view.displayAddedChoice(e.target);
 }
 
 Controller.prototype.removeChoice = function(e) {
-	console.log("anything")
-	console.log(e.target)
 	this.view.removeAddedChoice(e.target)
 }
 
@@ -126,7 +99,7 @@ function Survey() {
 	this.id;
 	this.title;
 	this.questions;
-	this.currentQuestionIndex; // starts at 0. increment/decrement based on user clicks (next/previous question). you will know which question to grab from the questions array
+	this.currentQuestionIndex;
 };
 
 Survey.prototype.saveUserChoice = function() {
@@ -201,16 +174,9 @@ Survey.prototype.submitSurvey = function() {
 
 function Question() {
 	this.id;
-	this.answered = false;
 	this.content;
-	this.choices = {}; // an object where property is choice.id and value is choice.content
-	this.userChoice; // the choice.id that the user selected. this will be used when we need to save a user's response.
-};
-
-/*////////////////////////////////////////////////
-VIEWS
-	this.choices = []; // an object where property is choice.id and value is choice.content
-	this.userChoice; // the choice.id that the user selected. this will be used when we need to save a user's response.
+	this.choices = []; 
+	this.userChoice;
 };
 
 Question.prototype.setChoices = function(choices) {
@@ -225,9 +191,9 @@ function Choice(id, content) {
 	this.content = content;
 };
 
-// /*////////////////////////////////////////////////
-// // VIEWS
-// */////////////////////////////////////////////////
+/*////////////////////////////////////////////////
+VIEWS
+*/////////////////////////////////////////////////
 
 function View(survey) {
 	this.survey = survey;
@@ -238,7 +204,7 @@ function View(survey) {
 
 View.prototype.displayGetNextQuestion = function() {
 	var nextQuestion = this.survey.getNextQuestion();
-	var markup = this.survey.questionMarkup(nextQuestion); // markupNextQuestion(nextQuestion, this.survey.currentQuestionIndex, this.survey.questions.length);
+	var markup = this.survey.questionMarkup(nextQuestion);
 	this.survey.currentQuestionIndex++;
 	$('.take_survey_question_display').empty();
 	$('.take_survey_question_display').append(markup);

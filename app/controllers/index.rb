@@ -34,6 +34,6 @@ post '/register' do
 end
 
 get '/logout' do
-  current_user = nil
+  session[:user_id] = nil
   erb :index
 end
