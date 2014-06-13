@@ -1,7 +1,7 @@
-get '/surveys/new'
+get '/surveys/new' do
 
 end 
 
-get '/surveys/:id'
+get '/surveys/:id' do
 
 end 
