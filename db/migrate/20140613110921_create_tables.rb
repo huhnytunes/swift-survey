@@ -6,7 +6,6 @@ class CreateTables < ActiveRecord::Migration
 
       t.timestamps
     end 
-  end
 
   
     create_table :takers do |t| 
@@ -14,8 +13,7 @@ class CreateTables < ActiveRecord::Migration
       t.references :survey
 
       t.timestamps
-    end
-  end 
+    end 
 
   
     create_table :surveys do |t| 
@@ -23,8 +21,7 @@ class CreateTables < ActiveRecord::Migration
       t.references :creator
 
       t.timestamps
-    end
-  end 
+    end 
 
   
     create_table :questions do |t| 
@@ -33,16 +30,13 @@ class CreateTables < ActiveRecord::Migration
 
       t.timestamps
     end
-  end 
-
   
     create_table :choices do |t| 
       t.text :content
       t.references :question
 
       t.timestamps
-    end
-  end 
+    end 
 
   
     create_table :responses do |t| 
@@ -51,5 +45,5 @@ class CreateTables < ActiveRecord::Migration
 
       t.timestamps
     end
-  end 
+  end  
 end
