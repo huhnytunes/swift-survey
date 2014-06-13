@@ -2,7 +2,7 @@
 
 <% if @surveys %>
 <% @surveys.each do |survey| %>
-<a href="/user/surveys/<%= survey.id %>"><%=survey.title %></a><br>
+<a href="/user/surveys/<%= survey.id %>/stats"><%=survey.title %></a><br>
 <% end %>
 
 <% else %>
