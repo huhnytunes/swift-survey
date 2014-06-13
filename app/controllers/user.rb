@@ -4,8 +4,12 @@ get '/users/surveys' do
   erb :created_surveys
 end
 
-
 get '/users/surveys/:survey_id' do
-  @survey = Survey.where(survey_id: params[:survey_id])
-  erb :survey_stats
+  redirect '/surveys/:id'
+end
+
+get '/users/:id/surveys' do
+  @user = User.find(params[:id])
+  @surveys = Survey.where(creator_id: @user.id)
+  erb :created_surveys_other_user
 end
