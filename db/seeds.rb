@@ -1,3 +1,3 @@
-# 10.times do 
+# 10.times do
 #   User.create(username: )
-# end 
+# end
