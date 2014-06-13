@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+<link href="your-path/polaris/polaris.css" rel="stylesheet">
+<script src="your-path/icheck.js"></script>
+
 <head>
-  <!-- 
+  <!--
     normalize.css removes cross-browser differences in defaults, e.g.,
     differences in how form elements appear between Firefox and IE
     See: http://necolas.github.com/normalize.css/
@@ -15,9 +18,26 @@
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script src="/js/application.js"></script>
 
+
+<input type="checkbox">
+<input type="checkbox" checked>
+<input type="radio" name="iCheck">
+<input type="radio" name="iCheck" checked>
+
   <title></title>
 </head>
 <body>
+  <div id="movie"></div>
+  <script>
+    $(document).ready(function(){
+      $('input').iCheck({
+        checkboxClass: 'icheckbox_polaris',
+        radioClass: 'iradio_polaris',
+        increaseArea: '-10%' // optional
+      });
+    });
+</script>
+
   <%= yield %>
 </body>
 </html>
