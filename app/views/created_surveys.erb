@@ -1,0 +1,12 @@
+<h2>All Your Beautiful Surveys: </h2>
+
+<% if @surveys %>
+<% @surveys.each do |survey| %>
+<a href="/user/surveys/<%= survey.id %>"><% survey.title %></a><br>
+<% end %>
+<% else %>
+
+  <h3>): you haven't created any surveys!!</h3>
+  <p>Create Survey: </p> <a href="/surveys/new">Wee</a>
+
+<% end %>
