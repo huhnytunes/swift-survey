@@ -1,13 +1,12 @@
-<!-- survey title box
-question box
-choice box
-buttons for next question
-button for previous question
-submit post request button -->
 <form action="/surveys/create" method="post">
-<p>Survey title: </p><input type="text" name="title">
-<p>Question: </p><input type="text" name="question">
-<p>Choice: </p><input type="text" name="choice[1]">
-<p>Choice: </p><input type="text" name="choice[2]"> <button type="button">Add Choice</button><br><br>
-<input type="submit" value="Create Survey!!">
+  <ul id="question">
+    <p>Survey title: </p><input type="text" name="title">
+    <p>Question: </p><input type="text" name="1[]">
+    <p>Choices: </p>
+    <li><input type="text" name="1[][1]"></li>
+    <li><input type="text" name="1[][2]"></li>
+    <button class="add_choice" type="button">Add Choice</button><br>
+  </ul>
+  <button class="new_question" type="button">Add Question</button><br>
+  <input type="submit" value="Create Survey!!">
 </form>

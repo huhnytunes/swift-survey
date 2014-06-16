@@ -1,13 +1,7 @@
-<h1> Survey </h1> 
+<h1> Survey </h1>
 
-<h2><%=@questions.first.content%></h2> 
+<h2><%=@questions.first.content%></h2>
 
-<% @questions.first.choices.each do |choice|%> 
-<p class='choice'> <%=choice.content%> </p> 
-<%end%> 
-
-
-<!-- <form action='' method='get'>
-  <input type='text' name='answer' value='<%
-
-</form> -->
+<% @questions.first.choices.each do |choice|%>
+<p class='choice'> <%=choice.content%> </p>
+<%end%>
