@@ -1,16 +1,15 @@
-/*//////////////////////////////////////////////// 
-DOCUMENT READY 
+/*////////////////////////////////////////////////
+DOCUMENT READY
 */////////////////////////////////////////////////
 
 $(document).ready(function() {
 	var survey = new Survey();
 	var view = new View(survey);
 	var controller = new Controller($('body'),survey, view)
-
 });
 
-/*//////////////////////////////////////////////// 
-CONTROLLER 
+/*////////////////////////////////////////////////
+CONTROLLER
 */////////////////////////////////////////////////
 
 function Controller(el, survey, view) {
@@ -18,14 +17,19 @@ function Controller(el, survey, view) {
 	this.survey = survey;
 	this.view = view;
 
+	var self = this;
+
 	// CREATE SURVEY EVENTS
-	// listen for button to create new survey
-	$('.create_survey').on('click', this.createSurvey.bind(this));
+	// // listen for button to create new survey
+	// $('.create_survey').on('click', this.createSurvey.bind(this));
 	// listen for button to add new question
 	$('.new_question').on('click', this.addNewQuestion.bind(this));
 	// listen for button to submit survey
 	$('.submit_survey').on('click', this.submitSurvey.bind(this));
 	// listen for button to add choice to current question
+	$('#question').on('click', '.add_choice', this.addChoice.bind(this));
+	// listen for button to remove choice from current question
+	$('#question').on('click', '.remove_class', this.removeChoice.bind(this));
 	// $('.add_choice').on('click', this.addChoice.bind(this));
 	// listen for button to remove choice from current question
 	// $('.remove_choice').on('click', this.removeChoice.bind(this));
@@ -50,19 +54,21 @@ Controller.prototype.createSurvey = function(e) {
 };
 
 Controller.prototype.addNewQuestion = function(e) {
+	console.log(e.target)
 	// based on the user input, add a new question object to this.survey questions array
-	this.view.displayAddNewQuestion(); // ask view to display a new blank form 
+	this.view.displayAddNewQuestion(e.target); // ask view to display a new blank form
+
 };
 
 Controller.prototype.submitSurvey = function(e) {
-	this.survey.submitSurvey(); // have survey object send ajax request to save the survey (and its questions/choices) to the database 
-	// dont use e.preventDefault(). in the erb, have the route redirect to user's homepage. 
+	this.survey.submitSurvey(); // have survey object send ajax request to save the survey (and its questions/choices) to the database
+	// dont use e.preventDefault(). in the erb, have the route redirect to user's homepage.
 	// this way, we both have an ajax request and a route to the users homepage
 };
 
 Controller.prototype.getSurvey = function(e) {
 	e.preventDefault();
-	this.survey.id = e.target.id; 
+	this.survey.id = e.target.id;
 	var request = this.survey.getSurvey();
 	request.done( this.startSurvey.bind(this) );
 };
@@ -79,24 +85,45 @@ Controller.prototype.selectChoice = function(e) {
 }
 
 Controller.prototype.getNextQuestion = function(e) {
-	e.preventDefault();
-	this.survey.saveUserChoice();
-	this.view.displayGetNextQuestion();
+	// update appropriate question.userChoice based on what the user selected
+	this.view.displayGetNextQuestion(); // ask the view to display the next question:
 };
+
+// Controller.prototype.finishSurvey = function(e) {
+// 	// when this happens, user has answered every question in the survey (i.e. userChoice property exists for every question in the survey)
+// 	// we need to save this info in the db via AJAX => ask survey to do this
+// 	this.survey.finishSurvey();
+// 	// dont use e.preventDefault(). in erb, the route should redirect to some page (thanks for taking survey, etc?)
+// 	// this way, we both have an ajax request and a route to the users homepage
+// 	e.preventDefault();
+// 	this.survey.saveUserChoice();
+// 	this.view.displayGetNextQuestion();
+// };
 
 Controller.prototype.finishSurvey = function(e) {
 	e.preventDefault();
 	this.survey.saveUserChoice();
 	this.survey.finishSurvey();
-	this.view.surveyStats('show'); 
+	this.view.surveyStats('show');
 };
 
-/*//////////////////////////////////////////////// 
-MODELS 
+Controller.prototype.addChoice = function(e) {
+	// console.log(e.target)
+	this.view.displayAddedChoice(e.target);
+}
+
+Controller.prototype.removeChoice = function(e) {
+	console.log("anything")
+	console.log(e.target)
+	this.view.removeAddedChoice(e.target)
+}
+
+/*////////////////////////////////////////////////
+MODELS
 */////////////////////////////////////////////////
 
 function Survey() {
-	this.id; 
+	this.id;
 	this.title;
 	this.questions;
 	this.currentQuestionIndex; // starts at 0. increment/decrement based on user clicks (next/previous question). you will know which question to grab from the questions array
@@ -169,21 +196,27 @@ Survey.prototype.addNewQuestion = function() {
 };
 
 Survey.prototype.submitSurvey = function() {
-	
+
 };
 
 function Question() {
 	this.id;
 	this.answered = false;
 	this.content;
+	this.choices = {}; // an object where property is choice.id and value is choice.content
+	this.userChoice; // the choice.id that the user selected. this will be used when we need to save a user's response.
+};
+
+/*////////////////////////////////////////////////
+VIEWS
 	this.choices = []; // an object where property is choice.id and value is choice.content
-	this.userChoice; // the choice.id that the user selected. this will be used when we need to save a user's response. 
+	this.userChoice; // the choice.id that the user selected. this will be used when we need to save a user's response.
 };
 
 Question.prototype.setChoices = function(choices) {
 	for (var i = 0; i < choices.length; i++) {
 		var choice = choices[i];
-		this.choices.push(new Choice(choice.id, choice.content));	
+		this.choices.push(new Choice(choice.id, choice.content));
 	}
 };
 
@@ -192,12 +225,14 @@ function Choice(id, content) {
 	this.content = content;
 };
 
-/*//////////////////////////////////////////////// 
-VIEWS 
-*/////////////////////////////////////////////////
+// /*////////////////////////////////////////////////
+// // VIEWS
+// */////////////////////////////////////////////////
 
 function View(survey) {
 	this.survey = survey;
+	this.questionNumber = 1;
+	this.choiceNumber = 3;
 };
 
 View.prototype.displayGetNextQuestion = function() {
@@ -209,9 +244,28 @@ View.prototype.displayGetNextQuestion = function() {
 };
 
 View.prototype.displayAddNewQuestion = function() {
-	// display a form for user to add a new question
+	this.choiceNumber = 3;
+	$("ul").append(
+		'<p>Question: </p><input type="text" name="' + this.questionNumber++ +
+		'[]"> <p>Choices: </p> <li><input type="text" name="' + this.questionNumber +
+		'[][1]"></li> <li><input type="text" name="' + this.questionNumber +
+		'[][2]"></li> <button class="add_choice" type="button">Add Choice</button><br>')
 };
 
+View.prototype.displayAddedChoice = function(e) {
+	// this.questionNumber =
+	// var currentQuestionNumber =
+	console.log(this);
+	console.log($(e).next())
+	$(e).prev().after("<li><input type='text' name=" +
+		this.questionNumber + "[][" + this.choiceNumber++ +
+		"]> <button class='remove_class' type='button'>delete</button><br></li>")
+}
+
+View.prototype.removeAddedChoice = function(e) {
+	console.log(e)
+	$(e).parent().remove();
+}
 View.prototype.surveyStats = function(display) {
 	if (display==='show') {
 		$('.take_survey_question_display').hide();
