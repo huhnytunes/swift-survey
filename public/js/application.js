@@ -233,6 +233,7 @@ function View(survey) {
 	this.survey = survey;
 	this.questionNumber = 1;
 	this.choiceNumber = 3;
+	this.divNumber = 1;
 };
 
 View.prototype.displayGetNextQuestion = function() {
@@ -245,25 +246,25 @@ View.prototype.displayGetNextQuestion = function() {
 
 View.prototype.displayAddNewQuestion = function() {
 	this.choiceNumber = 3;
+	this.divNumber += 1
+	this.questionNumber += 1
 	$("ul").append(
-		'<p>Question: </p><input type="text" name="' + this.questionNumber++ +
+		'<div id=' + this.divNumber + '><p>Question: </p><input type="text" name="' + this.questionNumber +
 		'[]"> <p>Choices: </p> <li><input type="text" name="' + this.questionNumber +
 		'[][1]"></li> <li><input type="text" name="' + this.questionNumber +
 		'[][2]"></li> <button class="add_choice" type="button">Add Choice</button><br>')
 };
 
 View.prototype.displayAddedChoice = function(e) {
-	// this.questionNumber =
-	// var currentQuestionNumber =
-	console.log(this);
-	console.log($(e).next())
+	this.questionNumber = $(e).parent().attr("id")
+	this.choiceNumber = $(e).parent().children("li").length
+	this.choiceNumber += 1
 	$(e).prev().after("<li><input type='text' name=" +
-		this.questionNumber + "[][" + this.choiceNumber++ +
+		this.questionNumber + "[][" + this.choiceNumber +
 		"]> <button class='remove_class' type='button'>delete</button><br></li>")
 }
 
 View.prototype.removeAddedChoice = function(e) {
-	console.log(e)
 	$(e).parent().remove();
 }
 View.prototype.surveyStats = function(display) {
