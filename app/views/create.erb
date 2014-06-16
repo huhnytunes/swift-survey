@@ -1,11 +1,12 @@
 <form action="/surveys/create" method="post">
   <ul id="question">
     <p>Survey title: </p><input type="text" name="title">
-    <p>Question: </p><input type="text" name="1[]">
+    <div id="1"><p>Question: </p><input type="text" name="1[]">
     <p>Choices: </p>
     <li><input type="text" name="1[][1]"></li>
     <li><input type="text" name="1[][2]"></li>
-    <button class="add_choice" type="button">Add Choice</button><br>
+    <button class="add_choice" type="button">Add Choice</button>
+    </div><br>
   </ul>
   <button class="new_question" type="button">Add Question</button><br>
   <input type="submit" value="Create Survey!!">
