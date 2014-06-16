@@ -20,5 +20,14 @@ class User < ActiveRecord::Base
   def password=(plaintext)
     self.password_hash = BCrypt::Password.create(plaintext)
   end
+
+  def saveResponses(survey_id, responses)
+    self.taken_surveys << Survey.find(survey_id)  
+    responses.each do |response|
+      if !response[:userChoice].nil?
+        self.responses << Response.create(user_id: self.id, choice_id: response[:userChoice])
+      end
+    end
+  end
   
 end

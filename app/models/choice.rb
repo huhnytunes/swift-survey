@@ -4,4 +4,8 @@ class Choice < ActiveRecord::Base
   belongs_to :question
   has_many :responses
 
+  def as_json(options={})
+  	{id: self.id, content: self.content}
+  end
+
 end

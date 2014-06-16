@@ -13,14 +13,19 @@ post '/surveys/create' do
   redirect '/users/surveys'
 end
 
-get '/surveys/:id/stats' do
+get '/surveys/:id' do
   @survey = Survey.find(params[:id])
-  erb :survey_stats
+  erb :survey
 end
 
+get '/surveys/:id/questions' do
+  questions = Survey.find(params[:id]).questions
+  content_type :json
+  [Survey.find(params[:id]).title, questions].to_json
+end
 
-get '/surveys/:id/take' do
-  @survey = Survey.find(params[:id])
-  @questions = @survey.questions
-  erb :survey
+post '/surveys/:id/finish' do
+  questions = JSON.parse(params[:qs], {:symbolize_names => true})
+  current_user.saveResponses(params[:id],questions)
+  status 200
 end

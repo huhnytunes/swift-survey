@@ -35,6 +35,13 @@ questions.each do |question|
   end
 end
 
+# Users have taken all the survey
+surveys.each do |survey|
+  users.each do |user|
+    Taker.create(user_id: user.id, survey_id: survey.id)
+  end
+end
+
 
 
 
