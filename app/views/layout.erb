@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <link href="/polaris/polaris.css" rel="stylesheet">
-<script src="/js/icheck.js"></script>
 
 <head>
   <!--
@@ -17,26 +16,13 @@
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script src="/js/application.js"></script>
-
-
-<input type="checkbox">
-<input type="checkbox" checked>
-<input type="radio" name="iCheck">
-<input type="radio" name="iCheck" checked>
-
-  <title></title>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/bonsai/0.4/bonsai.min.js"></script>
+  <script src="/js/bonsai_test.js">
+  </script>
+  <title>Swift Survey</title>
 </head>
 <body>
-  <div id="movie"></div>
-  <script>
-    $(document).ready(function(){
-      $('input').iCheck({
-        checkboxClass: 'icheckbox_polaris',
-        radioClass: 'iradio_polaris',
-        increaseArea: '-10%' // optional
-      });
-    });
-</script>
 <div class="container">
   <%= yield %>
 </div>

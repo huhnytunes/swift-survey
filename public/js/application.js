@@ -26,17 +26,19 @@ function Controller(el, survey, view) {
 	// listen for button to submit survey
 	$('.submit_survey').on('click', this.submitSurvey.bind(this));
 	// listen for button to add choice to current question
-	$('.add_choice').on('click', this.addChoice.bind(this));
+	// $('.add_choice').on('click', this.addChoice.bind(this));
 	// listen for button to remove choice from current question
-	$('.remove_choice').on('click', this.removeChoice.bind(this));
+	// $('.remove_choice').on('click', this.removeChoice.bind(this));
 
 	// TAKE SURVEY EVENTS
 	// listen for button to take new survey
 	$('.take_survey').on('click', this.getSurvey.bind(this));
+	// listen for a choice selection
+	$('.take_survey_question_display').on('click', 'p.choice', this.selectChoice.bind(this));
 	// listen for button to get next question
-	$('.next_question').on('click', this.getNextQuestion.bind(this));
+	$('.take_survey_question_display').on('click', 'a.next_question', this.getNextQuestion.bind(this));
 	// listen for button to finish survey
-	$('.finish_survey').on('click', this.finishSurvey.bind(this));
+	$('.take_survey_question_display').on('click', 'a.finish_survey', this.finishSurvey.bind(this));
 
 }
 
@@ -59,22 +61,34 @@ Controller.prototype.submitSurvey = function(e) {
 };
 
 Controller.prototype.getSurvey = function(e) {
-	this.survey.id = // get this from the survey_id in href
-	this.survey.getSurvey(); // send AJAX request to load up title and questions associated with this survey
-	this.view.displayGetNextQuestion(); // ask the view to display the next question
+	e.preventDefault();
+	this.survey.id = e.target.id; 
+	var request = this.survey.getSurvey();
+	request.done( this.startSurvey.bind(this) );
 };
 
+Controller.prototype.startSurvey = function(response) {
+	this.survey.setTitleQuestions(response);
+	this.view.surveyStats('hide');
+	this.view.displayGetNextQuestion();
+}
+
+Controller.prototype.selectChoice = function(e) {
+	$('.choice').removeClass('selected');
+	$(e.target).addClass('selected');
+}
+
 Controller.prototype.getNextQuestion = function(e) {
-	// update appropriate question.userChoice based on what the user selected
-	this.view.displayGetNextQuestion(); // ask the view to display the next question: 
+	e.preventDefault();
+	this.survey.saveUserChoice();
+	this.view.displayGetNextQuestion();
 };
 
 Controller.prototype.finishSurvey = function(e) {
-	// when this happens, user has answered every question in the survey (i.e. userChoice property exists for every question in the survey)
-	// we need to save this info in the db via AJAX => ask survey to do this
-	this.survey.finishSurvey(); 
-	// dont use e.preventDefault(). in erb, the route should redirect to some page (thanks for taking survey, etc?)
-	// this way, we both have an ajax request and a route to the users homepage
+	e.preventDefault();
+	this.survey.saveUserChoice();
+	this.survey.finishSurvey();
+	this.view.surveyStats('show'); 
 };
 
 /*//////////////////////////////////////////////// 
@@ -84,25 +98,64 @@ MODELS
 function Survey() {
 	this.id; 
 	this.title;
+	this.questions;
+	this.currentQuestionIndex; // starts at 0. increment/decrement based on user clicks (next/previous question). you will know which question to grab from the questions array
+};
+
+Survey.prototype.saveUserChoice = function() {
+	var questionIndex = $('.question').attr('id');
+	var selectedChoiceIndex = $('.selected').attr('id') || null;
+	if (selectedChoiceIndex != null) {
+		this.questions[questionIndex].userChoice = this.questions[questionIndex].choices[selectedChoiceIndex].id;
+	}
+};
+
+Survey.prototype.setTitleQuestions = function(response) {
+	this.title = response[0];
+	var ques  = response[1];
 	this.questions = [];
-	this.currentQuestionIndex = 0 // starts at 0. increment/decrement based on user clicks (next/previous question). you will know which question to grab from the questions array
+	this.currentQuestionIndex = 0;
+
+	for (var i=0; i<ques.length; i++) {
+		var question = new Question();
+		question.id = ques[i].id;
+		question.content = ques[i].content;
+		question.setChoices(ques[i].choices);
+		this.questions.push(question);
+	}
 };
 
 Survey.prototype.getSurvey = function() {
-	// based on this.id, send an AJAX call, which should return survey title, questions, and choices.
-	// based on the response, we should set this.title and this.questions
-	this.currentQuestionIndex = 0; // reset this to 0
+	var request = $.ajax({
+		url: '/surveys/' + this.id + '/questions',
+		type: 'GET'
+	});
+	return request;
 };
 
 Survey.prototype.getNextQuestion = function() {
 	var nextQuestion = this.questions[this.currentQuestionIndex]
-	this.currentQuestionIndex++;
 	return nextQuestion;
 };
 
 Survey.prototype.finishSurvey = function() {
-
+	var request = $.ajax({
+		url: '/surveys/' + this.id + '/finish',
+		type: 'POST',
+	   	data: {qs: JSON.stringify(this.questions)}
+	});
+	return request;
 };
+
+Survey.prototype.questionMarkup = function(question) {
+	var markup = "<h1>" + this.title + "</h1><h2 class='question' id='" + this.currentQuestionIndex + "'>" + question.content + "</h2>";
+	for (var i = 0; i < question.choices.length; i++ ) {
+		markup += "<p id='" + i + "' class='choice'>" + question.choices[i].content + "</p>";
+	}
+	markup += "<a class='next_question' href='/'>Next Question</a><br/>";
+	markup += "<a class='finish_survey' href='/'>Finish Survey</a>";
+	return markup;
+}
 
 Survey.prototype.createSurvey = function(title) {
 	this.survey.title = title;
@@ -123,8 +176,20 @@ function Question() {
 	this.id;
 	this.answered = false;
 	this.content;
-	this.choices = {}; // an object where property is choice.id and value is choice.content
+	this.choices = []; // an object where property is choice.id and value is choice.content
 	this.userChoice; // the choice.id that the user selected. this will be used when we need to save a user's response. 
+};
+
+Question.prototype.setChoices = function(choices) {
+	for (var i = 0; i < choices.length; i++) {
+		var choice = choices[i];
+		this.choices.push(new Choice(choice.id, choice.content));	
+	}
+};
+
+function Choice(id, content) {
+	this.id = id;
+	this.content = content;
 };
 
 /*//////////////////////////////////////////////// 
@@ -136,12 +201,24 @@ function View(survey) {
 };
 
 View.prototype.displayGetNextQuestion = function() {
-	// ask survey what it's next available question is
 	var nextQuestion = this.survey.getNextQuestion();
-	// display this question (make sure to remove any questions currently on the page)
+	var markup = this.survey.questionMarkup(nextQuestion); // markupNextQuestion(nextQuestion, this.survey.currentQuestionIndex, this.survey.questions.length);
+	this.survey.currentQuestionIndex++;
+	$('.take_survey_question_display').empty();
+	$('.take_survey_question_display').append(markup);
 };
 
 View.prototype.displayAddNewQuestion = function() {
 	// display a form for user to add a new question
 };
 
+View.prototype.surveyStats = function(display) {
+	if (display==='show') {
+		$('.take_survey_question_display').hide();
+		$('.survey_stats').show();
+		$('.survey_stats').prepend("<p>You've taken this survey</p>");
+		$('a.take_survey').remove();
+	} else if (display==="hide") {
+		$('.survey_stats').hide();
+	}
+}
